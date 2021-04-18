@@ -13,8 +13,8 @@ spec:
         app: story
     spec:
       containers:
-        - name: story
-          image: oshriperetz/devops_volume_project_end
+      - name: story
+        image: oshriperetz/devops_volume_project_end
           volumeMounts:
             - mountPath: /app/story
               name: story-volume
@@ -23,3 +23,29 @@ spec:
           hostPath:
             path: /data
             type: DirectoryOrCreate
+
+---
+
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: comeandeat
+spec:
+  schedule: "*/1 * * * *"
+  concurrencyPolicy: Forbid #Replace
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: comeandeat
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: kubectl
+            image: bitnami/kubectl 
+            command:
+            - kubectl
+            - rollout
+            - restart
+            - deployment/story
